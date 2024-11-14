@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -51,6 +54,7 @@ import com.castaneda.coffemobileapp.R
 import com.castaneda.coffemobileapp.data.model.Product
 import com.castaneda.coffemobileapp.utils.ROUTES
 import com.castaneda.coffemobileapp.ui.components.Banner
+import com.castaneda.coffemobileapp.ui.components.ProductCard
 import com.castaneda.coffemobileapp.ui.components.SearchFilter
 import com.castaneda.coffemobileapp.ui.theme.bg_black
 import com.castaneda.coffemobileapp.ui.theme.primary
@@ -223,8 +227,9 @@ private fun DetailBox(state: List<Product>) {
         val category = listOf(
             "Machiato","Latte","Americano","Cappuccino"
         )
+    Column {
 
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(bottom = 12.dp)) {
             item {
                 Button(
                     onClick = { /*TODO*/ },
@@ -258,11 +263,17 @@ private fun DetailBox(state: List<Product>) {
             }
         }
         
-        LazyColumn {
-            items(state){
-                Text(text = it.titulo)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(top = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(13.dp)
+        ) {
+            items(state){product->
+                ProductCard(product = product)
             }
         }
+    }
 
     }
 }
