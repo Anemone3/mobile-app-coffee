@@ -15,15 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -62,6 +62,7 @@ import com.castaneda.coffemobileapp.ui.theme.sora
 import com.castaneda.coffemobileapp.ui.theme.subtitle
 import com.castaneda.coffemobileapp.ui.theme.textgray
 import com.castaneda.coffemobileapp.ui.viewmodels.ProductsViewModel
+import com.castaneda.coffemobileapp.utils.Resource
 
 
 data class BottomNavigationItem(
@@ -69,21 +70,39 @@ data class BottomNavigationItem(
     val route: String
 )
 
+val itemsList = listOf(
+    BottomNavigationItem(
+        icon = R.drawable.home,
+        route = ROUTES.HOME
+    ),
+    BottomNavigationItem(
+        icon = R.drawable.heart,
+        route = ROUTES.DETAIL
+    ),
+    BottomNavigationItem(
+        icon = R.drawable.bag,
+        route = ROUTES.DELIVERY
+    ),
+    BottomNavigationItem(
+        icon = R.drawable.notification,
+        route = ROUTES.ORDER
+    )
+)
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: ProductsViewModel = hiltViewModel()) {
     val state by viewModel.stateProduct.collectAsState()
-    Log.d("Cantidad.items", "${state.size}")
+    Log.d("Cantidad.items", "${state.data?.size}")
 
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         bottomBar = {
-
             NavigationBar(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(100.dp)
                     .clip(shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
                 ,
                 containerColor = Color.White,
@@ -121,36 +140,22 @@ fun HomeScreen(navController: NavController, viewModel: ProductsViewModel = hilt
                     )
                 }
             }
+        },
+        topBar = {
+            Spacer(modifier = Modifier.padding(top = 0.dp))
         }
     ) {
-        HomeContent(modifier = Modifier.padding(it), state = state)
+        HomeContent(modifier = Modifier.padding(it).fillMaxSize(), state = state)
     }
 
 
 }
 
-val itemsList = listOf(
-    BottomNavigationItem(
-        icon = R.drawable.home,
-        route = ROUTES.HOME
-    ),
-    BottomNavigationItem(
-        icon = R.drawable.heart,
-        route = ROUTES.DETAIL
-    ),
-    BottomNavigationItem(
-        icon = R.drawable.bag,
-        route = ROUTES.DELIVERY
-    ),
-    BottomNavigationItem(
-        icon = R.drawable.notification,
-        route = ROUTES.ORDER
-    )
-)
+
 
 @Composable
-private fun HomeContent(modifier: Modifier = Modifier, state: List<Product>) {
-    Box(modifier = modifier) {
+private fun HomeContent(modifier: Modifier = Modifier, state: Resource<List<Product>>) {
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -218,21 +223,22 @@ private fun HomeContent(modifier: Modifier = Modifier, state: List<Product>) {
 
 
 @Composable
-private fun DetailBox(state: List<Product>) {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 24.dp)
-        .padding(top = 340.dp + 44.dp)) {
+private fun DetailBox(state: Resource<List<Product>>) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp)
+            .padding(top = 340.dp + 44.dp)
+    ) {
+        val category = listOf("Machiato", "Latte", "Americano", "Cappuccino")
 
-        val category = listOf(
-            "Machiato","Latte","Americano","Cappuccino"
-        )
-    Column {
-
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(bottom = 12.dp)) {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(bottom = 12.dp)
+        ) {
             item {
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { /* TODO */ },
                     shape = RoundedCornerShape(6.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = primary,
@@ -241,14 +247,19 @@ private fun DetailBox(state: List<Product>) {
                     modifier = Modifier.height(29.dp),
                     contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
-                    Text(text = "All Coffe", textAlign = TextAlign.Center,fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp, color = Color.White, fontFamily = sora)
-                } }
-            items(category.size){
+                    Text(
+                        text = "All Coffe",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontFamily = sora
+                    )
+                }
+            }
+            items(category.size) {
                 Button(
-                    onClick = {
-                        /*TODO*/
-                    },
+                    onClick = { /* TODO */ },
                     shape = RoundedCornerShape(6.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFEDEDED),
@@ -257,26 +268,56 @@ private fun DetailBox(state: List<Product>) {
                     modifier = Modifier.height(29.dp),
                     contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
-                    Text(text = category[it], textAlign = TextAlign.Center, fontWeight = FontWeight.Normal,
-                        fontSize = 14.sp, color = bg_black, fontFamily = sora)
+                    Text(
+                        text = category[it],
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 14.sp,
+                        color = bg_black,
+                        fontFamily = sora
+                    )
                 }
             }
         }
-        
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(top = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(13.dp)
-        ) {
-            items(state){product->
-                ProductCard(product = product)
+
+        // Lista de productos
+        when (state) {
+            is Resource.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentSize(Alignment.Center)
+                )
+            }
+            is Resource.Success -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(top = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    horizontalArrangement = Arrangement.spacedBy(13.dp)
+                ) {
+                    items(state.data ?: emptyList()) { product ->
+                        ProductCard(product = product)
+                    }
+                }
+            }
+            is Resource.Error -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentSize(Alignment.Center)
+                ) {
+                    Text(
+                        text = state.message ?: "Ocurrió un error",
+                        color = Color.Red,
+                        fontFamily = sora
+                    )
+                }
             }
         }
     }
-
-    }
 }
+
 
 @Composable
 private fun TargetLocalization() {

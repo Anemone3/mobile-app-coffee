@@ -37,8 +37,8 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 Surface(
                     modifier = Modifier
-                                .padding(paddingValues = WindowInsets.navigationBars.asPaddingValues())
-                                .fillMaxSize()
+                        .padding(paddingValues = WindowInsets.navigationBars.asPaddingValues())
+                        .fillMaxSize()
                 ) {
                     NavHost(navController = navController, startDestination = ROUTES.ONBOARDING) {
                         composable(route = ROUTES.ONBOARDING){
