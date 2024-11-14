@@ -1,6 +1,7 @@
 package com.castaneda.coffemobileapp.ui.screens
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -25,6 +28,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,10 +44,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.castaneda.coffemobileapp.R
-import com.castaneda.coffemobileapp.constants.ROUTES
+import com.castaneda.coffemobileapp.data.model.Product
+import com.castaneda.coffemobileapp.utils.ROUTES
 import com.castaneda.coffemobileapp.ui.components.Banner
 import com.castaneda.coffemobileapp.ui.components.SearchFilter
 import com.castaneda.coffemobileapp.ui.theme.bg_black
@@ -51,6 +57,7 @@ import com.castaneda.coffemobileapp.ui.theme.primary
 import com.castaneda.coffemobileapp.ui.theme.sora
 import com.castaneda.coffemobileapp.ui.theme.subtitle
 import com.castaneda.coffemobileapp.ui.theme.textgray
+import com.castaneda.coffemobileapp.ui.viewmodels.ProductsViewModel
 
 
 data class BottomNavigationItem(
@@ -58,8 +65,11 @@ data class BottomNavigationItem(
     val route: String
 )
 
+
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, viewModel: ProductsViewModel = hiltViewModel()) {
+    val state by viewModel.stateProduct.collectAsState()
+    Log.d("Cantidad.items", "${state.size}")
 
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -109,7 +119,7 @@ fun HomeScreen(navController: NavController) {
             }
         }
     ) {
-        HomeContent(modifier = Modifier.padding(it))
+        HomeContent(modifier = Modifier.padding(it), state = state)
     }
 
 
@@ -135,74 +145,76 @@ val itemsList = listOf(
 )
 
 @Composable
-private fun HomeContent(modifier: Modifier = Modifier) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        //Top Box
-        Box(modifier = Modifier
-            .height(236.dp + 44.dp)
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color.Transparent, Color(0xFF050505)),
-                    startY = 0f,
-                    endY = 70f
-                )
-            )) {
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(bg_black, Color(0xFF111111))
-                        )
+private fun HomeContent(modifier: Modifier = Modifier, state: List<Product>) {
+    Box(modifier = modifier) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            //Top Box
+            Box(modifier = Modifier
+                .height(236.dp + 44.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color.Transparent, Color(0xFF050505)),
+                        startY = 0f,
+                        endY = 70f
                     )
-                    .padding(24.dp)
-            ) {
-                Spacer(modifier = Modifier.padding(top = 44.dp))
-                Text(
-                    text = "Location",
-                    fontFamily = sora,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = textgray
-                )
+                )) {
 
-                //Dropdown - Locales
-                Row(
-                    modifier = Modifier.padding(top = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(bg_black, Color(0xFF111111))
+                            )
+                        )
+                        .padding(24.dp)
                 ) {
-                    TargetLocalization()
-                }
+                    Spacer(modifier = Modifier.padding(top = 44.dp))
+                    Text(
+                        text = "Location",
+                        fontFamily = sora,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = textgray
+                    )
 
-                //Buscador y botón de filter
-                SearchFilter()
+                    //Dropdown - Locales
+                    Row(
+                        modifier = Modifier.padding(top = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        TargetLocalization()
+                    }
+
+                    //Buscador y botón de filter
+                    SearchFilter()
+                }
             }
         }
+
+
+        //Promo card
+        Box(modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .padding(top = 176.dp + 44.dp)) {
+            Banner()
+
+        }
+
+        //Detail Box
+        DetailBox(state)
     }
-
-
-    //Promo card
-    Box(modifier = Modifier
-        .padding(horizontal = 24.dp)
-        .padding(top = 176.dp + 44.dp)) {
-        Banner()
-
-    }
-
-    //Detail Box
-    DetailBox()
 }
 
 
 
 
 @Composable
-private fun DetailBox(){
+private fun DetailBox(state: List<Product>) {
     Box(modifier = Modifier
         .fillMaxSize()
         .padding(horizontal = 24.dp)
@@ -245,6 +257,13 @@ private fun DetailBox(){
                 }
             }
         }
+        
+        LazyColumn {
+            items(state){
+                Text(text = it.titulo)
+            }
+        }
+
     }
 }
 

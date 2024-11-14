@@ -1,4 +1,4 @@
-package com.castaneda.coffemobileapp.constants
+package com.castaneda.coffemobileapp.utils
 
 object ROUTES {
     const val HOME = "/home"

@@ -14,16 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.castaneda.coffemobileapp.constants.ROUTES
+import com.castaneda.coffemobileapp.utils.ROUTES
 import com.castaneda.coffemobileapp.ui.screens.DeliveryScreen
 import com.castaneda.coffemobileapp.ui.screens.DetailScreen
 import com.castaneda.coffemobileapp.ui.screens.HomeScreen
 import com.castaneda.coffemobileapp.ui.screens.OnBoardingScreen
 import com.castaneda.coffemobileapp.ui.screens.OrderScreen
 import com.castaneda.coffemobileapp.ui.theme.CoffeMobileAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(navController)
                         }
                         composable(route = ROUTES.DETAIL){
-                            DetailScreen()
+                            DetailScreen(navController)
                         }
                         composable(route = ROUTES.DELIVERY){
                             DeliveryScreen()

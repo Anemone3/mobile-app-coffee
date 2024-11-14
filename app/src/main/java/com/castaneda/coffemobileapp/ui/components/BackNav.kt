@@ -21,13 +21,13 @@ import com.castaneda.coffemobileapp.R
 import com.castaneda.coffemobileapp.ui.theme.sora
 
 @Composable
-fun BackNav( title: String) {
+fun BackNav( title: String, onBack: ()->Unit = {}) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ){
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = onBack) {
             Icon(painter = painterResource(id = R.drawable.arrow_left), contentDescription = "back", modifier = Modifier.size(24.dp))
         }
         Text(text = title, fontSize = 16.sp, fontFamily = sora, fontWeight = FontWeight.SemiBold)

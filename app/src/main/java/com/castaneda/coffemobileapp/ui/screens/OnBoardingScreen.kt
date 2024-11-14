@@ -1,18 +1,14 @@
 package com.castaneda.coffemobileapp.ui.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.castaneda.coffemobileapp.R
-import com.castaneda.coffemobileapp.constants.ROUTES
+import com.castaneda.coffemobileapp.utils.ROUTES
 import com.castaneda.coffemobileapp.ui.components.LargeButton
 import com.castaneda.coffemobileapp.ui.theme.sora
 import com.castaneda.coffemobileapp.ui.theme.textgray
@@ -42,19 +38,21 @@ fun OnBoardingScreen(navController: NavController) {
     Box(modifier = Modifier
         .fillMaxSize()
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.coffe_bg),
-            contentDescription = "coffe home",
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-            //Arreglar aqui el tamaño, en el celular se mira mal TODO
-        )
-        Box(modifier = Modifier.fillMaxWidth()
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart){
+            Image(
+                painter = painterResource(id = R.drawable.coffe_bg),
+                contentDescription = "coffe home",
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .fillMaxWidth()
+                //Arreglar aqui el tamaño, en el celular se mira mal TODO
+            )
+        }
+        Box(modifier = Modifier
+            .fillMaxWidth()
             .height(390.dp)
             .align(Alignment.BottomEnd)
-            .drawBehind{ // Dibuja el degradado detrás del contenido
+            .drawBehind { // Dibuja el degradado detrás del contenido
                 val gradient = Brush.verticalGradient(
                     colors = listOf(Color.Transparent, Color(0xFF050505)),
                     startY = 60f,
@@ -64,15 +62,15 @@ fun OnBoardingScreen(navController: NavController) {
             }
         )
 
-
             //Title
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        horizontal = 24.dp,
-                        vertical = 20.dp
-                    ),
+                        horizontal = 24.dp
+                    )
+                    .padding(bottom = 25.dp)
+                ,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
@@ -80,7 +78,7 @@ fun OnBoardingScreen(navController: NavController) {
                 TitleText(title = "Fall in Love with")
                 TitleText(title = " Coffee in Blissful ")
                 TitleText(title = "Delight!")
-                Spacer(modifier = Modifier.padding(bottom = 8.dp))
+                Spacer(modifier = Modifier.padding(bottom = 13.dp))
                 //Desc
                 DescText(desc = "Welcome to our cozy coffee corner, where")
                 DescText(desc = "every cup is a delightful for you.")
@@ -108,7 +106,7 @@ private fun TitleText(title: String) {
         fontWeight = FontWeight.Bold,
         fontSize = 32.sp,
         textAlign = TextAlign.Center,
-        letterSpacing = 2.sp,
+        letterSpacing = 2.6.sp,
         lineHeight = 53.sp
     )
 }
