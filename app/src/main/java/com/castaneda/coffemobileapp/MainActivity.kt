@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.castaneda.coffemobileapp.utils.ROUTES
 import com.castaneda.coffemobileapp.ui.screens.DeliveryScreen
 import com.castaneda.coffemobileapp.ui.screens.DetailScreen
@@ -37,7 +39,6 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 Surface(
                     modifier = Modifier
-                        .padding(paddingValues = WindowInsets.navigationBars.asPaddingValues())
                         .fillMaxSize()
                 ) {
                     NavHost(navController = navController, startDestination = ROUTES.ONBOARDING) {
@@ -47,8 +48,12 @@ class MainActivity : ComponentActivity() {
                         composable(route = ROUTES.HOME){
                             HomeScreen(navController)
                         }
-                        composable(route = ROUTES.DETAIL){
-                            DetailScreen(navController)
+                        composable(
+                            route = ROUTES.DETAIL,
+                            arguments = listOf(navArgument("productId"){type= NavType.IntType})
+                        ){navBackEntry ->
+                            val idProduct = navBackEntry.arguments?.getInt("productId") ?: -1
+                            DetailScreen(navController, idProduct)
                         }
                         composable(route = ROUTES.DELIVERY){
                             DeliveryScreen()

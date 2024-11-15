@@ -1,5 +1,6 @@
 package com.castaneda.coffemobileapp.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.castaneda.coffemobileapp.R
@@ -45,9 +49,18 @@ import com.castaneda.coffemobileapp.ui.theme.primary
 import com.castaneda.coffemobileapp.ui.theme.sora
 import com.castaneda.coffemobileapp.ui.theme.text_title
 import com.castaneda.coffemobileapp.ui.theme.textgray
+import com.castaneda.coffemobileapp.ui.viewmodels.ProductsViewModel
 
 @Composable
-fun DetailScreen(navController: NavController) {
+fun DetailScreen(navController: NavController, idProduct: Int, viewModel: ProductsViewModel = hiltViewModel()) {
+
+    val productDetail by viewModel.stateProductDetail.collectAsState()
+    
+    LaunchedEffect(idProduct) {
+        viewModel.getProductById(idProduct)
+        Log.d("DetailProduct",productDetail.data.toString())
+    }
+    Log.d("DetailProduct2",productDetail.data.toString())
     Scaffold(
         bottomBar = {
             //Hacer la confirmación de la compra y la muestra del precio
@@ -189,5 +202,5 @@ fun OptionsButtons(image: Int, size: Int) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun DetailScreenPreview() {
-    DetailScreen(navController = rememberNavController())
+    DetailScreen(navController = rememberNavController(), idProduct = 1)
 }

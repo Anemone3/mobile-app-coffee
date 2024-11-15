@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -54,6 +57,7 @@ import com.castaneda.coffemobileapp.R
 import com.castaneda.coffemobileapp.data.model.Product
 import com.castaneda.coffemobileapp.utils.ROUTES
 import com.castaneda.coffemobileapp.ui.components.Banner
+import com.castaneda.coffemobileapp.ui.components.BottomBar
 import com.castaneda.coffemobileapp.ui.components.ProductCard
 import com.castaneda.coffemobileapp.ui.components.SearchFilter
 import com.castaneda.coffemobileapp.ui.theme.bg_black
@@ -65,112 +69,47 @@ import com.castaneda.coffemobileapp.ui.viewmodels.ProductsViewModel
 import com.castaneda.coffemobileapp.utils.Resource
 
 
-data class BottomNavigationItem(
-    val icon: Int,
-    val route: String
-)
 
-val itemsList = listOf(
-    BottomNavigationItem(
-        icon = R.drawable.home,
-        route = ROUTES.HOME
-    ),
-    BottomNavigationItem(
-        icon = R.drawable.heart,
-        route = ROUTES.DETAIL
-    ),
-    BottomNavigationItem(
-        icon = R.drawable.bag,
-        route = ROUTES.DELIVERY
-    ),
-    BottomNavigationItem(
-        icon = R.drawable.notification,
-        route = ROUTES.ORDER
-    )
-)
+
+
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: ProductsViewModel = hiltViewModel()) {
     val state by viewModel.stateProduct.collectAsState()
     Log.d("Cantidad.items", "${state.data?.size}")
 
-    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .clip(shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
-                ,
-                containerColor = Color.White,
-            ){
-                itemsList.forEachIndexed { index, bottomNavigationItem ->
-                    NavigationBarItem(
-                        modifier = Modifier.padding(PaddingValues(top = 40.dp)),
-                        selected = selectedItemIndex == index,
-                        onClick = {
-                            selectedItemIndex = index
-                            navController.navigate(bottomNavigationItem.route)
-                        },
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = bottomNavigationItem.icon),
-                                contentDescription = "",
-                                modifier = Modifier.size(24.dp),
-                                tint = when (selectedItemIndex) {
-                                    index -> primary
-                                    else -> Color.Gray
-                                }
-                            )
-                        },
-                        label = {
-                            Box(modifier = Modifier
-                                .width(10.dp)
-                                .height(5.dp)
-                                .background(color = primary, shape = RoundedCornerShape(18.dp)))
-                        },
-                        alwaysShowLabel = false,
-                        enabled = true,
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
-                    )
-                }
-            }
+            BottomBar(navController = navController)
         },
         topBar = {
-            Spacer(modifier = Modifier.padding(top = 0.dp))
+           Spacer(modifier = Modifier.padding(top = 0.dp))
         }
-    ) {
-        HomeContent(modifier = Modifier.padding(it).fillMaxSize(), state = state)
+    ) { innerPadding ->
+        HomeContent(modifier = Modifier.padding(innerPadding), state = state,navController)
     }
-
-
 }
 
 
-
 @Composable
-private fun HomeContent(modifier: Modifier = Modifier, state: Resource<List<Product>>) {
-    Box(modifier = modifier.fillMaxSize()) {
+private fun HomeContent(modifier: Modifier = Modifier, state: Resource<List<Product>>,navController: NavController) {
+    Box(modifier = modifier) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
-            //Top Box
-            Box(modifier = Modifier
-                .height(236.dp + 44.dp)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color(0xFF050505)),
-                        startY = 0f,
-                        endY = 70f
+            // Top Box
+            Box(
+                modifier = Modifier
+                    .height(236.dp + 44.dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color(0xFF050505)),
+                            startY = 0f,
+                            endY = 70f
+                        )
                     )
-                )) {
-
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -190,7 +129,7 @@ private fun HomeContent(modifier: Modifier = Modifier, state: Resource<List<Prod
                         color = textgray
                     )
 
-                    //Dropdown - Locales
+                    // Dropdown - Locales
                     Row(
                         modifier = Modifier.padding(top = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -199,31 +138,30 @@ private fun HomeContent(modifier: Modifier = Modifier, state: Resource<List<Prod
                         TargetLocalization()
                     }
 
-                    //Buscador y botón de filter
+                    // Buscador y botón de filtro
                     SearchFilter()
                 }
             }
         }
 
-
-        //Promo card
-        Box(modifier = Modifier
-            .padding(horizontal = 24.dp)
-            .padding(top = 176.dp + 44.dp)) {
+        // Promo card
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 176.dp + 44.dp)
+        ) {
             Banner()
-
         }
 
-        //Detail Box
-        DetailBox(state)
+        // Detail Box
+        DetailBox(state, navController = navController)
     }
 }
 
 
 
-
 @Composable
-private fun DetailBox(state: Resource<List<Product>>) {
+private fun DetailBox(state: Resource<List<Product>>, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -297,7 +235,9 @@ private fun DetailBox(state: Resource<List<Product>>) {
                     horizontalArrangement = Arrangement.spacedBy(13.dp)
                 ) {
                     items(state.data ?: emptyList()) { product ->
-                        ProductCard(product = product)
+                        ProductCard(product = product){
+                            navController.navigate(ROUTES.createDetailRoute(product.id))
+                        }
                     }
                 }
             }

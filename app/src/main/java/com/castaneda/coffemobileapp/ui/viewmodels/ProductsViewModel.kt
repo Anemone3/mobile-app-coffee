@@ -3,6 +3,7 @@ package com.castaneda.coffemobileapp.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.castaneda.coffemobileapp.data.model.Product
+import com.castaneda.coffemobileapp.data.model.ProductDetail
 import com.castaneda.coffemobileapp.data.repository.ProductsRepository
 import com.castaneda.coffemobileapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,10 +17,17 @@ import javax.inject.Inject
 class ProductsViewModel @Inject constructor(
     private val productsRepository: ProductsRepository
 ):ViewModel() {
+
+
     private val _productState = MutableStateFlow<Resource<List<Product>>>(Resource.Loading())
+    private val _productDetailState = MutableStateFlow<Resource<ProductDetail>>(Resource.Loading());
+
 
     val stateProduct: StateFlow<Resource<List<Product>>>
         get() = _productState
+
+
+    val stateProductDetail: StateFlow<Resource<ProductDetail>> = _productDetailState
 
     init {
        fetchProducts()
@@ -44,6 +52,17 @@ class ProductsViewModel @Inject constructor(
             } catch (e: Exception) {
                 // En caso de error, emitimos el estado de error
                 _productState.value = Resource.Error("Error al cargar los productos: ${e.message}")
+            }
+        }
+    }
+
+    fun getProductById(id:Int){
+        viewModelScope.launch {
+            try {
+                val productDetail = productsRepository.getProductsById(id)
+                _productDetailState.value = Resource.Success(productDetail)
+            } catch (e: Exception) {
+                _productDetailState.value = Resource.Error("Error al cargar el detalle del producto: ${e.message}")
             }
         }
     }

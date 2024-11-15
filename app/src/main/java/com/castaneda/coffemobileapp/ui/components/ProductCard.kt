@@ -48,13 +48,14 @@ import com.castaneda.coffemobileapp.ui.theme.textgray
 
 
 @Composable
-fun ProductCard(modifier: Modifier = Modifier, product: Product) {
+fun ProductCard(modifier: Modifier = Modifier, product: Product, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .size(width = 156.dp, height = 238.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        onClick = onClick
     ) {
         Column(
             modifier = Modifier
@@ -132,5 +133,5 @@ fun ProductCard(modifier: Modifier = Modifier, product: Product) {
 @Composable
 private fun ProductCardPreview() {
     ProductCard(product = Product(Category(1,"bedidas"),"xdxd",3,
-       "","Limón, agua, azúcar","7.00","Limonada C / Hierba Buena"))
+       "","Limón, agua, azúcar","7.00","Limonada C / Hierba Buena"), onClick = {})
 }
