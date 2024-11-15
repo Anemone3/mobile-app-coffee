@@ -27,72 +27,63 @@ import com.castaneda.coffemobileapp.ui.theme.textgray
 @Composable
 fun ExpandableText(
     modifier: Modifier = Modifier,
-    textModifier: Modifier = Modifier,
-    style: TextStyle = LocalTextStyle.current,
-    fontStyle: FontStyle? = null,
     text: String,
     collapsedMaxLine: Int = 3,
     showMoreText: String = "Read More",
-    showMoreStyle: SpanStyle = SpanStyle(fontWeight = FontWeight.SemiBold, color = primary, fontFamily = sora, fontSize = 14.sp),
     showLessText: String = " Show Less",
-    showLessStyle: SpanStyle = showMoreStyle,
-    textAlign: TextAlign? = null,
-    fontSize: TextUnit,
-    onTextExpanded: () -> Unit,
-    onTextCollapsed: () -> Unit
+    fontSize: TextUnit = 14.sp,
+    onTextExpanded: () -> Unit = {},
+    onTextCollapsed: () -> Unit = {}
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     var clickable by remember { mutableStateOf(false) }
     var lastCharIndex by remember { mutableIntStateOf(0) }
 
-    Box(modifier = Modifier.clickable(clickable) {
-        isExpanded = !isExpanded
+    Box(
+        modifier = Modifier.clickable(clickable) {
+            isExpanded = !isExpanded
             if (isExpanded) {
-                onTextExpanded() // Llamaa la lambda cuando se expande
+                onTextExpanded()
             } else {
                 onTextCollapsed()
-                }
+            }
         }.then(modifier)
     ) {
-        Text(text = buildAnnotatedString {
-            if(clickable){
-                if(isExpanded){
-                    // Display the full text and "Show Less" button when expanded.
+        Text(
+            text = buildAnnotatedString {
+                if (clickable) {
+                    if (isExpanded) {
+                        // Texto completo con "Show Less"
+                        append(text)
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, color = primary, fontFamily = sora, fontSize = 14.sp)) {
+                            append(showLessText)
+                        }
+                    } else {
+                        // Texto truncado con "Read More"
+                        val safeEndIndex = minOf(lastCharIndex, text.length)
+                        val adjustedText = text.substring(0, safeEndIndex)
+                        append(adjustedText)
+
+                        if (adjustedText.length > showMoreText.length) {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, color = primary)) {
+                                append("... $showMoreText")
+                            }
+                        }
+                    }
+                } else {
                     append(text)
-                    withStyle(style = showLessStyle){
-                        append(showLessText)
-                    }
-                }else{
-                    // Display truncated text and "Show More" button when collapsed.
-                    val adjustText = text.substring(startIndex = 0, endIndex = lastCharIndex)
-
-                        .dropLast(showMoreText.length) //Espacio que tendra entre el final el Read More
-                    append(adjustText+".. ")
-
-                    withStyle(style = showMoreStyle){
-                        append(showMoreText)
-                    }
-                }
-            }  else{
-                // Display the full text when not clickable.
-                append(text)
-            }
-        },
-            maxLines = if(isExpanded) Int.MAX_VALUE else 3, //3
-            fontStyle = fontStyle,
-            // Callback to determine visual overflow and enable click ability.
-            onTextLayout = {
-                if (!isExpanded && it.hasVisualOverflow) {
-                    clickable = true
-                    lastCharIndex = it.getLineEnd(collapsedMaxLine -1)
                 }
             },
-            style = style,
-            textAlign = textAlign,
+            maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLine,
             fontSize = fontSize,
-            fontFamily = sora,
-            fontWeight = FontWeight.Light,
-            color = textgray
+            onTextLayout = { layoutResult ->
+                if (!isExpanded && layoutResult.hasVisualOverflow) {
+                    clickable = true
+                    lastCharIndex = layoutResult.getLineEnd(
+                        (collapsedMaxLine - 1).coerceAtMost(layoutResult.lineCount - 1)
+                    ).coerceAtMost(text.length)
+                }
+            },
         )
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -94,9 +95,10 @@ fun DetailProduct(navController: NavController, product: ProductDetail) {
                         contentDescription = product.titulo,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(202.dp),
-                        contentScale = ContentScale.FillWidth
+                            .aspectRatio(16f / 9f), // Mantén una proporción específica para evitar deformaciones
+                        contentScale = ContentScale.Crop
                     )
+
                 }
                 TitleRating(title = product.titulo, rating = "4.5", categoryname = product.nameCategory)
                 DividerComponent()
