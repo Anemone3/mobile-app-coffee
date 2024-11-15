@@ -8,14 +8,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -43,6 +46,7 @@ import androidx.navigation.compose.rememberNavController
 import com.castaneda.coffemobileapp.R
 import com.castaneda.coffemobileapp.ui.components.BackNav
 import com.castaneda.coffemobileapp.ui.components.ChooseSize
+import com.castaneda.coffemobileapp.ui.components.DetailProduct
 import com.castaneda.coffemobileapp.ui.components.DividerComponent
 import com.castaneda.coffemobileapp.ui.components.ExpandableText
 import com.castaneda.coffemobileapp.ui.theme.primary
@@ -50,6 +54,7 @@ import com.castaneda.coffemobileapp.ui.theme.sora
 import com.castaneda.coffemobileapp.ui.theme.text_title
 import com.castaneda.coffemobileapp.ui.theme.textgray
 import com.castaneda.coffemobileapp.ui.viewmodels.ProductsViewModel
+import com.castaneda.coffemobileapp.utils.Resource
 
 @Composable
 fun DetailScreen(navController: NavController, idProduct: Int, viewModel: ProductsViewModel = hiltViewModel()) {
@@ -61,143 +66,44 @@ fun DetailScreen(navController: NavController, idProduct: Int, viewModel: Produc
         Log.d("DetailProduct",productDetail.data.toString())
     }
     Log.d("DetailProduct2",productDetail.data.toString())
-    Scaffold(
-        bottomBar = {
-            //Hacer la confirmación de la compra y la muestra del precio
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(118.dp),
-                contentAlignment = Alignment.Center) {
-                Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment =Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)) {
-                    Column(modifier = Modifier.align(Alignment.Top), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(text = "Price", fontSize = 14.sp, fontWeight = FontWeight.Normal, fontFamily = sora, color = Color(0xFF909090))
-                        Text(text = "$ 4.53", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, fontFamily = sora, color = primary)
-                    }
-                    Button(onClick = { /*TODO*/ },modifier = Modifier
-                        .width(217.dp)
-                        .height(56.dp), shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = primary)) {
-                        Text(text = "Buy Now")
-                    }
-                }
+
+    when(productDetail){
+        is Resource.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                CircularProgressIndicator()
             }
         }
-    ) {
-        Box(modifier = Modifier.padding(it)) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                BackNav(title = "Detail", onBack = {navController.popBackStack()})
-                Box(
-                    modifier = Modifier
+        is Resource.Success -> {
+            DetailProduct(navController = navController, product = productDetail.data!!)
+        }
 
-                        .padding(vertical = 16.dp)){
-                    Image(
-                        painter = painterResource(id = R.drawable.coffe_detail),
-                        contentDescription = "Detail product",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(202.dp),
-                        contentScale = ContentScale.FillWidth
+        is Resource.Error -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = productDetail.message ?: "An error occurred",
+                        color = Color.Red
                     )
+                    Button(onClick = { navController.popBackStack() }) {
+                        Text("Go Back")
+                    }
                 }
-                TitleRating(title = "Cappuccino", rating = "4.5")
-                DividerComponent()
-                DescriptionCoffe()
-                Spacer(modifier = Modifier.padding(vertical = 4.dp))
-                DetailContent()
-                ChooseSize()
             }
         }
     }
 
+
 }
 
-@Composable
-fun DetailContent(){
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
-    ExpandableText(
-        text = "A cappuccino is an approximately 150 ml (5 oz) beverage, with 25 ml of espresso coffee and 85ml of fresh milk the fo..is an approximately 150 ml (5 oz) beverage, with 25 ml of espresso coffee and 85ml of fresh milk",
-        fontSize = 14.sp,
-        onTextExpanded = { isExpanded = true },
-        onTextCollapsed = { isExpanded = false }
-    )
-    Spacer(modifier = Modifier.padding(vertical = if (isExpanded) 10.dp else 24.dp))
-}
 
-@Composable 
-fun DescriptionCoffe() {
-    Text(
-        text = "Description",
-        color = text_title,
-        fontFamily = sora,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 16.sp
-    )
-}
-
-@Composable
-fun TitleRating(title: String, rating: String) {
-    Column(modifier = Modifier
-        .fillMaxWidth()) {
-        Text(text = title, color = text_title, fontFamily = sora, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, textAlign = TextAlign.End)
-        Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "Ice/Hot",
-                color = textgray,
-                fontFamily = sora,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(bottom = 3.dp)
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.width(156.dp)) {
-                OptionsButtons(R.drawable.bike, size = 32)
-                OptionsButtons(R.drawable.bean, size = 24)
-                OptionsButtons(R.drawable.milk,size = 24)
-            }
-        }
-        StarRatingC(rating= "4.8", review = "200")
-    }
-}
-
-@Composable
-fun StarRatingC(rating: String, review: String) {
-    Row( verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-
-        Icon(
-            painter = painterResource(id = R.drawable.star),
-            contentDescription = "Star",
-            tint = Color(0xFFFBBE21),
-            modifier = Modifier.size(20.dp)
-        )
-        Text(text = rating,
-            color = Color(0xFF2A2A2A),
-            fontFamily = sora,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp)
-        Text(text = "(${review})", color = textgray, fontFamily = sora, fontWeight = FontWeight.Normal, fontSize = 12.sp)
-    }
-}
-
-@Composable
-fun OptionsButtons(image: Int, size: Int) {
-    Box(modifier = Modifier
-        .size(44.dp)
-        .background(
-            brush = linearGradient(
-                colors = listOf(
-                    Color(0xFFEDEDED).copy(alpha = 0.35f),  // Color con 35% de opacidad
-                    Color.Transparent
-                )
-
-            ), shape = RoundedCornerShape(12.dp)
-        ), contentAlignment = Alignment.Center) {
-        Icon(painter = painterResource(image), contentDescription = "delivery buttons", modifier = Modifier.size(size.dp), tint = primary)
-    }
-}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

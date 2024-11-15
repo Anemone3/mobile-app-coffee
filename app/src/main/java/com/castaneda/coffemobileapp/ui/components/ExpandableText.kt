@@ -66,7 +66,7 @@ fun ExpandableText(
                     // Display truncated text and "Show More" button when collapsed.
                     val adjustText = text.substring(startIndex = 0, endIndex = lastCharIndex)
 
-                        .dropLast(showMoreText.length + 23) //Espacio que tendra entre el final el Read More
+                        .dropLast(showMoreText.length) //Espacio que tendra entre el final el Read More
                     append(adjustText+".. ")
 
                     withStyle(style = showMoreStyle){

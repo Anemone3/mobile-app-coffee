@@ -56,7 +56,7 @@ fun ChooseSize() {
 fun SizeButton(size: Char, isSelected: Boolean, onSelect: () -> Unit) {
     val buttonColor = if (isSelected) primary.copy(0.1f) else Color.White
     val borderColor = if (isSelected) Color(0xFFC67C4E) else surface
-    Button(onClick = { onSelect() }, // Llama a la función lambda para actualizar el estado
+    Button(onClick =  onSelect , // Llama a la función lambda para actualizar el estado
         modifier = Modifier
             .width(96.dp)
             .height(41.dp),
