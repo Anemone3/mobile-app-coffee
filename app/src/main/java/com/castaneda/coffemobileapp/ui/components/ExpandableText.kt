@@ -2,6 +2,9 @@ package com.castaneda.coffemobileapp.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.castaneda.coffemobileapp.ui.theme.primary
 import com.castaneda.coffemobileapp.ui.theme.sora
@@ -26,64 +30,40 @@ import com.castaneda.coffemobileapp.ui.theme.textgray
 
 @Composable
 fun ExpandableText(
-    modifier: Modifier = Modifier,
     text: String,
-    collapsedMaxLine: Int = 3,
+    modifier: Modifier = Modifier,
+    collapsedMaxLines: Int = 3,
     showMoreText: String = "Read More",
-    showLessText: String = " Show Less",
+    showLessText: String = "Show Less",
+    textStyle: TextStyle = LocalTextStyle.current,
     fontSize: TextUnit = 14.sp,
-    onTextExpanded: () -> Unit = {},
-    onTextCollapsed: () -> Unit = {}
+    fontWeight: FontWeight = FontWeight.Light,
+    onToggle: ((Boolean) -> Unit)? = null
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    var clickable by remember { mutableStateOf(false) }
-    var lastCharIndex by remember { mutableIntStateOf(0) }
 
-    Box(
-        modifier = Modifier.clickable(clickable) {
-            isExpanded = !isExpanded
-            if (isExpanded) {
-                onTextExpanded()
-            } else {
-                onTextCollapsed()
-            }
-        }.then(modifier)
-    ) {
+    Column(modifier = modifier) {
         Text(
-            text = buildAnnotatedString {
-                if (clickable) {
-                    if (isExpanded) {
-                        // Texto completo con "Show Less"
-                        append(text)
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, color = primary, fontFamily = sora, fontSize = 14.sp)) {
-                            append(showLessText)
-                        }
-                    } else {
-                        // Texto truncado con "Read More"
-                        val safeEndIndex = minOf(lastCharIndex, text.length)
-                        val adjustedText = text.substring(0, safeEndIndex)
-                        append(adjustedText)
-
-                        if (adjustedText.length > showMoreText.length) {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold, color = primary)) {
-                                append("... $showMoreText")
-                            }
-                        }
-                    }
-                } else {
-                    append(text)
-                }
-            },
-            maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLine,
+            text = text,
+            style = textStyle,
             fontSize = fontSize,
-            onTextLayout = { layoutResult ->
-                if (!isExpanded && layoutResult.hasVisualOverflow) {
-                    clickable = true
-                    lastCharIndex = layoutResult.getLineEnd(
-                        (collapsedMaxLine - 1).coerceAtMost(layoutResult.lineCount - 1)
-                    ).coerceAtMost(text.length)
+            fontWeight = fontWeight,
+            maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLines,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Text(
+            text = if (isExpanded) showLessText else showMoreText,
+            style = textStyle.copy(
+                fontSize = fontSize,
+                fontWeight = FontWeight.SemiBold,
+                color = primary
+            ),
+            modifier = Modifier
+                .clickable {
+                    isExpanded = !isExpanded
+                    onToggle?.invoke(isExpanded)
                 }
-            },
+                .padding(top = 4.dp)
         )
     }
 }

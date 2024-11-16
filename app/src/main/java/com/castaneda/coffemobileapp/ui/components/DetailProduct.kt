@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,9 +48,7 @@ import coil.compose.AsyncImage
 import com.castaneda.coffemobileapp.R
 import com.castaneda.coffemobileapp.data.model.ProductDetail
 import com.castaneda.coffemobileapp.ui.theme.primary
-import com.castaneda.coffemobileapp.ui.theme.secondary
 import com.castaneda.coffemobileapp.ui.theme.sora
-import com.castaneda.coffemobileapp.ui.theme.surface
 import com.castaneda.coffemobileapp.ui.theme.text_title
 import com.castaneda.coffemobileapp.ui.theme.textgray
 
@@ -85,7 +85,7 @@ fun DetailProduct(navController: NavController, product: ProductDetail) {
         }
     ) {
         Box(modifier = Modifier.padding(it)) {
-            Column(modifier = Modifier.padding(24.dp)) {
+            Column(modifier = Modifier.padding(24.dp).fillMaxSize()) {
                 BackNav(title = "Detail", onBack = {navController.popBackStack()})
                 Box(
                     modifier = Modifier
@@ -107,7 +107,6 @@ fun DetailProduct(navController: NavController, product: ProductDetail) {
                 DetailContent(product.descripcion)
                 Spacer(modifier = Modifier.weight(1f))
                 ChooseSize()
-                Spacer(modifier = Modifier.weight(0.3f))
             }
         }
     }
@@ -115,20 +114,17 @@ fun DetailProduct(navController: NavController, product: ProductDetail) {
 
 @Composable
 fun DetailContent(descripcion: String){
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
+
     ExpandableText(
-        text =  descripcion,
+        text = descripcion,
+        collapsedMaxLines = 2,
+        showMoreText = "Read More",
+        showLessText = "Show Less",
+        textStyle = LocalTextStyle.current,
         fontSize = 14.sp,
-        collapsedMaxLine = 3,
-        onTextExpanded = { isExpanded = true },
-        onTextCollapsed = { isExpanded = false },
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(max = 150.dp)
     )
-    Spacer(modifier = Modifier.padding(vertical = if (isExpanded) 10.dp else 24.dp))
 }
 
 @Composable
